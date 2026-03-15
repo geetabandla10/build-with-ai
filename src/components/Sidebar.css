@@ -1,0 +1,95 @@
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 280px;
+  z-index: 50;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  overflow-y: auto;
+}
+
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 3rem;
+  padding-left: 0.5rem;
+}
+
+.logo-icon {
+  color: #818cf8;
+}
+
+.sidebar-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.875rem 1rem;
+  border-radius: 12px;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+.nav-item.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.nav-item .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-toggle {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.25rem;
+  z-index: 60;
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .sidebar-toggle {
+    display: none;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
