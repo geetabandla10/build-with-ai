@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ShieldCheck, Sparkles } from 'lucide-react';
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, guestLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSuccess = (credentialResponse) => {
@@ -33,6 +33,16 @@ const LoginPage = () => {
               theme="filled_blue"
               shape="pill"
             />
+          </div>
+
+          <div className="guest-login-wrapper">
+             <button 
+               className="guest-login-btn glass" 
+               onClick={() => { guestLogin(); navigate('/notes'); }}
+             >
+               <Sparkles size={16} />
+               <span>Sign in as Guest (Bypass Auth)</span>
+             </button>
           </div>
           
           <div className="login-divider">

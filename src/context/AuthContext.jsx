@@ -20,13 +20,23 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(userData));
   };
 
+  const guestLogin = () => {
+    const userData = {
+      name: 'Guest User',
+      email: 'guest@example.com',
+      picture: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest',
+    };
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, guestLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );
