@@ -25,15 +25,22 @@ const LoginPage = () => {
         </div>
 
         <div className="login-body">
-          <div className="google-btn-wrapper">
-            <GoogleLogin
-              onSuccess={handleSuccess}
-              onError={() => console.log('Login Failed')}
-              useOneTap
-              theme="filled_blue"
-              shape="pill"
-            />
-          </div>
+          {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
+            <div className="google-btn-wrapper">
+              <GoogleLogin
+                onSuccess={handleSuccess}
+                onError={() => console.log('Login Failed')}
+                useOneTap
+                theme="filled_blue"
+                shape="pill"
+              />
+            </div>
+          ) : (
+            <div className="auth-notice glass">
+              <p>Google Auth is currently unconfigured.</p>
+              <small>Add <code>VITE_GOOGLE_CLIENT_ID</code> to your <code>.env</code> to activate.</small>
+            </div>
+          )}
 
           <div className="guest-login-wrapper">
              <button 

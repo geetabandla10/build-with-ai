@@ -65,7 +65,21 @@
 
 .login-header h1 { font-size: 2.25rem; margin-bottom: 0.5rem; }
 .login-subtitle { color: var(--text-muted); }
-.login-body { display: flex; flex-direction: column; gap: 2rem; }
+.login-body { display: flex; flex-direction: column; gap: 1.5rem; }
+.auth-notice {
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  font-size: 0.85rem;
+  color: #fbbf24;
+}
+.auth-notice code {
+  color: #fff;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
 .google-btn-wrapper { display: flex; justify-content: center; }
 
 .guest-login-wrapper {
