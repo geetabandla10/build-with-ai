@@ -1,4 +1,7 @@
 {
   "name": "build-with-ai-suite",
-  "framework": "vite"
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" }
+  ]
 }
