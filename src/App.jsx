@@ -10,8 +10,8 @@ import ResumeMaker from './pages/ResumeMaker';
 import LoginPage from './pages/LoginPage';
 import './App.css';
 
-// Placeholder Client ID
-const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
+// Google Client ID from environment variables
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
