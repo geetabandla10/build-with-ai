@@ -9,7 +9,23 @@ const YouTubeSummariser = () => {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(0);
   const [activeTab, setActiveTab] = useState('url'); // 'url', 'transcript', 'screenshot'
+  const [screenshot, setScreenshot] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState(null);
   const fileInputRef = useRef(null);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (screenshotPreview) URL.revokeObjectURL(screenshotPreview);
+      setScreenshotPreview(URL.createObjectURL(file));
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setScreenshot(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const steps = [
     "Analyzing input source...",
@@ -19,7 +35,7 @@ const YouTubeSummariser = () => {
   ];
 
   const handleSummarize = async () => {
-    const input = activeTab === 'url' ? url : activeTab === 'transcript' ? manualTranscript : 'screenshot';
+    const input = activeTab === 'url' ? url : activeTab === 'transcript' ? manualTranscript : screenshot;
     if (!input) return;
     
     setLoading(true);
@@ -36,16 +52,32 @@ const YouTubeSummariser = () => {
 
       let prompt = '';
       if (activeTab === 'url') {
-        prompt = `Please provide a detailed summary of the content at this URL: ${url}. Include an Overview, Key Highlights (as a bulleted list), and a Verdict.`;
+        setStep(1); // "Extracting textual content..."
+        try {
+          const { data } = await axios.get(`/api/transcript?url=${encodeURIComponent(url)}`);
+          prompt = `Please summarize the following transcript from a video: ${data.transcript}. \n\nInclude an Overview, Key Highlights (as a bulleted list), and a Verdict.`;
+        } catch (err) {
+          throw new Error(err.response?.data?.error || 'Failed to extract transcript. Please try the "Paste Transcript" tab for this video.');
+        }
       } else if (activeTab === 'transcript') {
         prompt = `Please summarize the following transcript: ${manualTranscript}. Include an Overview, Key Highlights (as a bulleted list), and a Verdict.`;
       } else if (activeTab === 'screenshot') {
-        prompt = `Please summarize the content from an uploaded screenshot. Assume the screenshot contains text related to a video or document. Include an Overview, Key Highlights (as a bulleted list), and a Verdict.`;
+        if (!screenshot) throw new Error("Please upload a screenshot first.");
+        prompt = `Please summarize the content from this uploaded screenshot. Assume the screenshot contains text related to a video or document. Include an Overview, Key Highlights (as a bulleted list), and a Verdict.`;
+      }
+
+      // Format message depending on whether it's an image or text
+      const messages = [{ role: 'user', content: prompt }];
+      if (activeTab === 'screenshot') {
+        messages[0].content = [
+          { type: "text", text: prompt },
+          { type: "image_url", image_url: { url: screenshot } }
+        ];
       }
 
       const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-        model: 'openai/gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }]
+        model: activeTab === 'screenshot' ? 'google/gemini-2.5-flash:free' : 'openrouter/free',
+        messages: messages
       }, {
         headers: {
           'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
@@ -77,7 +109,7 @@ const YouTubeSummariser = () => {
       await new Promise(r => setTimeout(r, 800));
     } catch (error) {
       console.error('AI Processing Error:', error);
-      alert('Failed to analyze. Please check your API key, network connection, or input.');
+      alert(error.message || 'Failed to analyze. Please check your API key, network connection, or input.');
     } finally {
       setLoading(false);
     }
@@ -149,16 +181,30 @@ const YouTubeSummariser = () => {
               style={{ 
                 border: '2px dashed var(--glass-border)', 
                 borderRadius: '16px', 
-                padding: '3rem', 
+                padding: screenshotPreview ? '1rem' : '3rem', 
                 textAlign: 'center', 
                 cursor: 'pointer',
-                background: 'rgba(255,255,255,0.02)'
+                background: 'rgba(255,255,255,0.02)',
+                position: 'relative',
+                overflow: 'hidden'
               }}
             >
-              <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept="image/*" />
-              <Upload size={40} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
-              <h4 style={{ marginBottom: '0.5rem' }}>Click to upload screenshot</h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Best for mobile users who cannot copy transcripts</p>
+              <input type="file" ref={fileInputRef} onChange={handleImageUpload} style={{ display: 'none' }} accept="image/*" />
+              
+              {screenshotPreview ? (
+                <>
+                  <img src={screenshotPreview} alt="Screenshot preview" style={{ maxHeight: '200px', maxWidth: '100%', objectFit: 'contain', borderRadius: '8px' }} />
+                  <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}>
+                    <p style={{ color: 'white', fontWeight: 'bold' }}>Click to change image</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Upload size={40} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
+                  <h4 style={{ marginBottom: '0.5rem' }}>Click to upload screenshot</h4>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Best for mobile users who cannot copy transcripts</p>
+                </>
+              )}
             </div>
           )}
 
