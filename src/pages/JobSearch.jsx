@@ -13,41 +13,51 @@ const JobSearch = () => {
     
     // Simulating robust Firecrawl API results
     setTimeout(() => {
-      setResults([
-        { 
-          id: 1, 
-          title: 'Senior AI Research Engineer', 
-          company: 'Nexus Intelligence', 
-          location: 'Bangalore, India (Remote)', 
-          salary: '₹35L - ₹55L',
-          posted: '2 days ago',
-          tags: ['Python', 'PyTorch', 'LLMs'],
-          url: 'https://example.com/apply/nexus'
-        },
-        { 
-          id: 2, 
-          title: 'GenAI Full Stack Developer', 
-          company: 'SparkFlow Systems', 
-          location: 'San Francisco, CA', 
-          salary: '$160k - $210k',
-          posted: '5h ago',
-          tags: ['React', 'Node.js', 'OpenAI'],
-          url: 'https://example.com/apply/sparkflow'
-        },
-        { 
-          id: 3, 
-          title: 'Machine Learning Architect', 
-          company: 'OptiData Labs', 
-          location: 'Remote', 
-          salary: '€80k - €120k',
-          posted: '1 week ago',
-          tags: ['AWS', 'TensorFlow', 'MLOps'],
-          url: 'https://example.com/apply/optidata'
+      const companies = ['Google', 'Microsoft', 'Amazon', 'TCS', 'Infosys', 'Wipro', 'IBM', 'Accenture', 'Cognizant', 'Capgemini', 'Tech Mahindra', 'HCLTech', 'Oracle', 'Cisco', 'Adobe'];
+      const platforms = ['LinkedIn', 'Naukri', 'Internshala'];
+      const tagPool = ['React', 'Node.js', 'Python', 'LLMs', 'AWS', 'TensorFlow', 'Java', 'C++', 'Go', 'Docker', 'Kubernetes', 'SQL', 'NoSQL', 'Agile', 'DevOps', 'Machine Learning', 'AI', 'Frontend'];
+      
+      const generatedJobs = [];
+      const queryRole = role || 'Software Engineer';
+      const locString = location || 'India';
+
+      for (let i = 1; i <= 50; i++) {
+        const platform = platforms[Math.floor(Math.random() * platforms.length)];
+        const company = companies[Math.floor(Math.random() * companies.length)];
+        
+        let dynamicUrl = '';
+        if (platform === 'LinkedIn') {
+            const searchKeywords = encodeURIComponent(`${queryRole} ${company}`);
+            dynamicUrl = `https://www.linkedin.com/jobs/search/?keywords=${searchKeywords}&location=${encodeURIComponent(locString)}`;
+        } else if (platform === 'Naukri') {
+            const naukriRole = queryRole.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            const naukriCompany = company.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            const naukriLoc = locString.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            dynamicUrl = `https://www.naukri.com/${naukriCompany}-${naukriRole}-jobs-in-${naukriLoc}`;
+        } else if (platform === 'Internshala') {
+            const internshalaSearch = encodeURIComponent(`${queryRole} ${company}`).replace(/%20/g, '-');
+            dynamicUrl = `https://internshala.com/jobs/${internshalaSearch}-jobs/`;
         }
-      ].map(job => ({
-        ...job,
-        displayLocation: location.toLowerCase().includes('remote') ? job.location : `${location} (Nearby)`
-      })));
+
+        const shuffledTags = [...tagPool].sort(() => 0.5 - Math.random());
+        const salaryMin = Math.floor(Math.random() * 15) + 6;
+        const postedDays = Math.floor(Math.random() * 14);
+
+        generatedJobs.push({
+          id: i,
+          title: queryRole,
+          company: company,
+          location: locString,
+          displayLocation: locString.toLowerCase().includes('remote') ? locString : `${locString} (Nearby)`,
+          salary: `₹${salaryMin}L - ₹${salaryMin + Math.floor(Math.random() * 10) + 4}L`,
+          posted: postedDays === 0 ? 'Just now' : `${postedDays}d ago`,
+          tags: shuffledTags.slice(0, 3 + Math.floor(Math.random() * 2)),
+          url: dynamicUrl,
+          platform: platform
+        });
+      }
+      
+      setResults(generatedJobs);
       setSearching(false);
     }, 2000);
   };
@@ -106,9 +116,9 @@ const JobSearch = () => {
               <button 
                 onClick={() => window.open(job.url, '_blank')}
                 className="btn-primary" 
-                style={{ padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+                style={{ padding: '8px 16px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px', background: job.platform === 'LinkedIn' ? '#0a66c2' : job.platform === 'Naukri' ? '#275df5' : '#1295c9' }}
               >
-                Apply <ExternalLink size={14} />
+                Apply on {job.platform} <ExternalLink size={14} />
               </button>
             </div>
             

@@ -43,12 +43,23 @@ const LoginPage = () => {
           )}
 
           <div className="guest-login-wrapper">
+             <div className="auth-troubleshooting glass">
+               <p>🔑 Quick Access</p>
+               <small>Google Auth may be blocked on some environments. Use Guest Login for instant access.</small>
+             </div>
              <button 
-               className="guest-login-btn glass" 
+               className="guest-login-btn primary-glow" 
                onClick={() => { guestLogin(); navigate('/notes'); }}
+               style={{ 
+                 marginTop: '1rem', width: '100%', padding: '12px', 
+                 borderRadius: '30px', border: 'none', background: 'linear-gradient(45deg, #6366f1, #a855f7)',
+                 color: '#fff', fontWeight: 'bold', display: 'flex', alignItems: 'center', 
+                 justifyContent: 'center', gap: '10px', cursor: 'pointer',
+                 boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)'
+               }}
              >
-               <Sparkles size={16} />
-               <span>Sign in as Guest (Bypass Auth)</span>
+               <Sparkles size={18} />
+               <span>Access as Guest (Skip Login)</span>
              </button>
           </div>
           

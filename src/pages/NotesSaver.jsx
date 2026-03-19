@@ -432,9 +432,9 @@ const NotesSaver = () => {
             className="card glass"
             style={{ 
               width: '100%', 
-              maxWidth: '800px', 
-              maxHeight: '90vh',
-              padding: '2.5rem', 
+              maxWidth: '1100px', 
+              maxHeight: '95vh',
+              padding: '3rem', 
               borderRadius: '24px', 
               display: 'flex', 
               flexDirection: 'column', 
@@ -449,7 +449,7 @@ const NotesSaver = () => {
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>
                   {new Date(viewNote.created_at).toLocaleDateString(undefined, { dateStyle: 'long' })}
                 </span>
-                <h2 style={{ fontSize: '2rem', fontWeight: 700, lineHeight: '1.2', color: 'white' }}>{viewNote.title}</h2>
+                <h2 style={{ fontSize: '2.25rem', fontWeight: 700, lineHeight: '1.2', color: 'white' }}>{viewNote.title}</h2>
               </div>
               <button 
                 onClick={() => setViewNote(null)} 
@@ -463,7 +463,7 @@ const NotesSaver = () => {
               flex: 1, 
               overflowY: 'auto', 
               paddingRight: '1rem',
-              fontSize: '1.1rem',
+              fontSize: '1.2rem',
               lineHeight: '1.7',
               color: '#e2e8f0',
               whiteSpace: 'pre-wrap'
@@ -535,9 +535,9 @@ const NotesSaver = () => {
             className="card glass"
             style={{ 
               width: '100%', 
-              maxWidth: '700px', 
-              maxHeight: '85vh',
-              padding: '2.5rem', 
+              maxWidth: '1000px', 
+              maxHeight: '92vh',
+              padding: '3rem', 
               borderRadius: '28px', 
               display: 'flex', 
               flexDirection: 'column', 
@@ -579,7 +579,7 @@ const NotesSaver = () => {
                 borderRadius: '20px', 
                 background: 'rgba(99, 102, 241, 0.15)', 
                 border: '1px solid rgba(99, 102, 241, 0.3)',
-                fontSize: '1.25rem',
+                fontSize: '1.4rem',
                 lineHeight: '1.6',
                 color: '#fff',
                 fontStyle: 'italic'
@@ -639,7 +639,7 @@ const NotesSaver = () => {
         >
           <div
             className="card glass"
-            style={{ width: '100%', maxWidth: '540px', padding: '2rem', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            style={{ width: '100%', maxWidth: '800px', padding: '2.5rem', borderRadius: '20px', display: 'flex', flexDirection: 'column', gap: '1rem' }}
             onClick={e => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -661,7 +661,7 @@ const NotesSaver = () => {
                 value={editNote.content}
                 onChange={e => setEditNote(prev => ({ ...prev, content: e.target.value }))}
                 placeholder="Write your note here…"
-                rows={7}
+                rows={12}
                 style={{ fontSize: '0.9rem', resize: 'vertical' }}
               />
             </div>
