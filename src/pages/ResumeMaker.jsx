@@ -261,33 +261,32 @@ Respond ONLY with valid JSON exactly matching this structure:
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   const handleDownload = async () => {
     try {
-      const h2c = (await import('html2canvas')).default;
-      const { jsPDF } = await import('jspdf');
-      
+      let html2canvas, jsPDF;
+      try {
+        const h2c = 'html2canvas';
+        const jsp = 'jspdf';
+        html2canvas = (await import(/* @vite-ignore */ h2c)).default;
+        const jspdfModule = await import(/* @vite-ignore */ jsp);
+        jsPDF = jspdfModule.jsPDF;
+      } catch (e) {
+        html2canvas = window.html2canvas;
+        jsPDF = window.jspdf.jsPDF;
+      }
+      if (!html2canvas || !jsPDF) throw new Error('PDF libraries not found.');
+
       const element = previewRef.current;
-      const canvas = await h2c(element, { 
-        scale: 2, 
-        useCORS: true,
-        logging: false,
-        backgroundColor: '#ffffff'
-      });
-      
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${data.name.replace(/\s+/g, '_')}_Resume.pdf`);
+      pdf.save(`${data.name}_Resume.pdf`);
     } catch (error) {
-      console.error('PDF Generation Error:', error);
-      alert('Failed to generate PDF. Try using the "Print" button instead for better results.');
+      console.error('PDF Error:', error);
+      alert('Failed to generate PDF.');
     }
   };
 
@@ -809,9 +808,6 @@ Respond ONLY with valid JSON exactly matching this structure:
           </button>
           <button className="btn-secondary" onClick={handleSaveResume} disabled={saving} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'rgba(99, 102, 241, 0.1)', color: '#818cf8', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: '8px' }}>
             {saving ? <Loader2 size={18} className="spin" /> : <Save size={18} />} Save to Cloud
-          </button>
-          <button className="btn-primary" onClick={handlePrint} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: '#059669' }}>
-            <BookOpen size={18} /> Print A4
           </button>
           <button className="btn-primary" onClick={handleDownload} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
             <Download size={18} /> Download PDF

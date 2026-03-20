@@ -33,17 +33,4 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom', '@react-oauth/google', 'jwt-decode'],
-          ui: ['lucide-react'],
-          data: ['axios', '@supabase/supabase-js'],
-          resume: ['jspdf', 'html2canvas', 'tesseract.js']
-        }
-      }
-    },
-    chunkSizeWarningLimit: 1000 // Slightly increase limit as we are now intentionally splitting
-  }
 });
