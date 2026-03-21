@@ -15,6 +15,12 @@
   padding: 0;
 }
 
+@media (min-width: 1024px) {
+  .main-content.collapsed {
+    margin-left: 80px;
+  }
+}
+
 .content-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -23,8 +29,45 @@
 @media (max-width: 1024px) {
   .main-content {
     margin-left: 0;
-    padding-top: 5rem;
   }
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 40;
+}
+
+.global-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  margin-bottom: 1.5rem;
+}
+
+.hamburger-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .page-container {
@@ -267,5 +310,413 @@ input:focus, textarea:focus {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* --- Resume Maker Dark Theme Split Layout --- */
+.rm-layout {
+  display: flex;
+  height: calc(100vh - 130px);
+  width: 100%;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  border-radius: 16px;
+  border: 1px solid #222;
+  position: relative;
+}
+
+.rm-left-pane {
+  flex: 1;
+  max-width: 600px;
+  background: #0a0a0a;
+  border-right: 1px solid #222;
+  overflow-y: auto;
+  padding: 2rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.rm-left-pane::-webkit-scrollbar {
+  width: 6px;
+}
+.rm-left-pane::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+.rm-left-pane::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+.rm-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #fff, #aaa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.rm-header p {
+  color: #888;
+  font-size: 0.95rem;
+}
+
+.rm-load-data {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 1rem;
+}
+
+.rm-load-data:hover {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.rm-section-box {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.rm-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #fff;
+}
+
+.rm-number {
+  width: 28px;
+  height: 28px;
+  background: #252525;
+  color: #a78bfa;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.rm-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.rm-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rm-input-group label {
+  font-size: 0.85rem;
+  color: #888;
+  padding-left: 4px;
+}
+
+.rm-input {
+  background: #1a1a1a !important;
+  border: 1px solid #2a2a2a !important;
+  color: #fff !important;
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  font-size: 0.95rem !important;
+  width: 100%;
+}
+
+.rm-input:focus {
+  border-color: #444 !important;
+  background: #222 !important;
+}
+
+.rm-right-pane {
+  flex: 1;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.rm-right-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #111;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rm-right-header h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.rm-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.rm-btn-outline {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #333;
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.rm-btn-outline:hover {
+  background: #111;
+  border-color: #555;
+}
+
+.rm-btn-solid {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.rm-btn-solid:hover {
+  background: #eee;
+}
+
+.rm-style-selector {
+  padding: 1rem 2rem;
+  background: #050505;
+  border-bottom: 1px solid #111;
+}
+
+.rm-style-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.rm-styles-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.rm-styles-row::-webkit-scrollbar {
+  height: 4px;
+}
+.rm-styles-row::-webkit-scrollbar-track {
+  background: #000;
+}
+.rm-styles-row::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.rm-style-btn {
+  background: #111;
+  color: #888;
+  border: 1px solid #222;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rm-style-btn:hover {
+  background: #1a1a1a;
+  color: #ccc;
+}
+
+.rm-style-btn.active {
+  background: #fff;
+  color: #000;
+  font-weight: 600;
+  border-color: #fff;
+}
+
+.rm-preview-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.rm-preview-container::-webkit-scrollbar {
+  width: 8px;
+}
+.rm-preview-container::-webkit-scrollbar-track {
+  background: #000;
+}
+.rm-preview-container::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+/* --- Slide-in Editions Panel --- */
+.rm-editions-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  background: #0a0a0a;
+  border-left: 1px solid #222;
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+
+.rm-editions-panel.open {
+  transform: translateX(0);
+}
+
+.rm-editions-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rm-editions-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+
+.rm-close-btn {
+  background: transparent;
+  border: none;
+  color: #888;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.rm-close-btn:hover {
+  color: #fff;
+}
+
+.rm-editions-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rm-editions-content::-webkit-scrollbar {
+  width: 6px;
+}
+.rm-editions-content::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+.rm-editions-content::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 10px;
+}
+
+.rm-edition-card {
+  background: #111;
+  border: 1px solid #222;
+  padding: 1.2rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.rm-edition-card:hover {
+  border-color: #444;
+  transform: translateY(-2px);
+}
+
+.rm-edition-info h4 {
+  font-size: 1.05rem;
+  color: #fff;
+  margin: 0 0 6px 0;
+}
+
+.rm-edition-info p {
+  color: #888;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.rm-edition-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rm-btn-load {
+  flex: 1;
+  text-align: center;
+  justify-content: center;
+}
+
+.rm-btn-delete {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rm-btn-delete:hover {
+  background: #ef4444;
+  color: #fff;
 }
 

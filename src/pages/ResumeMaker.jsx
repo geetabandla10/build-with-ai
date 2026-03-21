@@ -63,6 +63,8 @@ const defaultData = {
   email: "d.agarwal@example.in",
   phone: "+91 11 5555 3345",
   location: "New Delhi, India 110034",
+  linkedin: "linkedin.com/in/diyaagarwal",
+  portfolio: "diya-agarwal.com",
   photo: PERSON_IMAGE,
   summary: "Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering 5 years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations.",
   skills: ["Cash register operation", "Inventory management", "POS system operation", "Accurate money handling", "Sales expertise", "Documentation and recordkeeping"],
@@ -111,7 +113,7 @@ const ResumeMaker = () => {
   
   const [saving, setSaving] = useState(false);
   const [savedResumes, setSavedResumes] = useState([]);
-  const [showSavedModal, setShowSavedModal] = useState(false);
+  const [isEditionsPanelOpen, setIsEditionsPanelOpen] = useState(false);
   const [fetchingResumes, setFetchingResumes] = useState(false);
 
   useEffect(() => {
@@ -175,7 +177,19 @@ const ResumeMaker = () => {
     if (record.resume_data.template) {
       setActiveTemplate(record.resume_data.template);
     }
-    setShowSavedModal(false);
+    setIsEditionsPanelOpen(false);
+  };
+
+  const handleDeleteResume = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this resume edition?")) return;
+    try {
+      const { error } = await supabase.from('resumes').delete().eq('id', id);
+      if (error) throw error;
+      loadSavedResumes();
+    } catch (error) {
+      console.error("Delete Error:", error);
+      alert("Failed to delete resume.");
+    }
   };
 
   const handleGenerateAI = async () => {
@@ -535,448 +549,206 @@ Respond ONLY with valid JSON exactly matching this structure:
   };
 
 
-  if (showGallery) {
-    return (
-      <div className="page-container" style={{ maxWidth: '1400px', background: '#f1f5f9', minHeight: '100vh', padding: '2rem' }}>
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-          <div>
-            <h2 style={{ fontSize: '2rem', color: '#111', fontWeight: 'bold' }}>Choose a template</h2>
-            <p style={{ color: '#666' }}>Standard, modern, and creative templates to help you land the job.</p>
-          </div>
-          <button className="btn-secondary" onClick={() => setShowGallery(false)}>Back to Editor</button>
-        </header>
+  return (
+    <div className="rm-layout">
+      {/* Left Pane - Editor */}
+      <div className="rm-left-pane">
+        <div className="rm-header">
+          <h1>Resume Details</h1>
+          <p>Enter your raw details, and let our AI craft the perfect phrasing.</p>
+        </div>
 
-        {/* Professional Filter Bar - Matching User Image UI */}
-        <div style={{ 
-          background: '#fff', padding: '1.25rem 2rem', borderRadius: '12px', 
-          display: 'flex', gap: '3rem', alignItems: 'center', flexWrap: 'wrap',
-          boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)',
-          border: '1px solid #e2e8f0', marginBottom: '3rem'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-             <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Filter by</span>
-             <select 
-                className="input-field" 
-                style={{ width: '130px', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#334155' }}
-                value={filters.photo}
-                onChange={(e) => setFilters({...filters, photo: e.target.value})}
-             >
-                <option>All</option>
-                <option>Headshot</option>
-                <option>No Photo</option>
-             </select>
+        {/* 1 Personal Information */}
+        <div className="rm-section-box">
+          <div className="rm-section-title">
+            <div className="rm-number">1</div>
+            Personal Information
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-             <select 
-                className="input-field" 
-                style={{ width: '130px', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#334155' }}
-                value={filters.layout}
-                onChange={(e) => setFilters({...filters, layout: e.target.value})}
-             >
-                <option>All</option>
-                <option>Graphics</option>
-                <option>Simple</option>
-             </select>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-             <select 
-                className="input-field" 
-                style={{ width: '130px', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#334155' }}
-                value={filters.columns}
-                onChange={(e) => setFilters({...filters, columns: e.target.value})}
-             >
-                <option>All</option>
-                <option>1 Column</option>
-                <option>2 Columns</option>
-             </select>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginLeft: 'auto' }}>
-             <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: '500' }}>Colors</span>
-             <div style={{ display: 'flex', gap: '10px' }}>
-                {['All', '#333', '#4f46e5', '#0891b2', '#f97316', '#dc2626'].map(c => (
-                   <div 
-                      key={c} 
-                      onClick={() => setFilters({...filters, color: c})}
-                      style={{ 
-                        width: '24px', height: '24px', borderRadius: '50%', 
-                        background: c === 'All' ? 'linear-gradient(45deg, #eee, #bbb)' : c, 
-                        cursor: 'pointer', border: filters.color === c ? '2px solid #3b82f6' : '2px solid #fff', 
-                        boxShadow: '0 0 0 1px #cbd5e1' 
-                      }} 
-                   />
-                ))}
-             </div>
+          <div className="rm-grid-2">
+            <div className="rm-input-group">
+              <label>Full Name</label>
+              <input className="rm-input" value={data.name} onChange={e => setData({...data, name: e.target.value})} placeholder="Full Name" />
+            </div>
+            <div className="rm-input-group">
+              <label>Email</label>
+              <input className="rm-input" value={data.email} onChange={e => setData({...data, email: e.target.value})} placeholder="Email" />
+            </div>
+            <div className="rm-input-group">
+              <label>Phone</label>
+              <input className="rm-input" value={data.phone} onChange={e => setData({...data, phone: e.target.value})} placeholder="Phone" />
+            </div>
+            <div className="rm-input-group">
+              <label>Location</label>
+              <input className="rm-input" value={data.location} onChange={e => setData({...data, location: e.target.value})} placeholder="City, State" />
+            </div>
+            <div className="rm-input-group">
+              <label>LinkedIn URL</label>
+              <input className="rm-input" value={data.linkedin || ''} onChange={e => setData({...data, linkedin: e.target.value})} placeholder="linkedin.com/..." />
+            </div>
+            <div className="rm-input-group">
+              <label>Portfolio/Website</label>
+              <input className="rm-input" value={data.portfolio || ''} onChange={e => setData({...data, portfolio: e.target.value})} placeholder="your-website.com" />
+            </div>
+            <div className="rm-input-group" style={{ gridColumn: '1 / -1' }}>
+              <label>Professional Summary</label>
+              <textarea className="rm-input" rows="4" value={data.summary} onChange={e => setData({...data, summary: e.target.value})} placeholder="Executive summary..."></textarea>
+            </div>
           </div>
         </div>
 
-        
-        <h3 style={{ marginTop: '2.5rem', marginBottom: '1.5rem', color: '#334155' }}>All templates (43)</h3>
-        
-        <div style={{ 
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-          gap: '2.5rem', paddingBottom: '4rem' 
-        }}>
-          {templates
-            .filter(t => {
-              if (filters.photo !== 'All' && t.photoType !== filters.photo) return false;
-              if (filters.layout !== 'All' && t.layoutStyle !== filters.layout) return false;
-              if (filters.columns !== 'All') {
-                const colMatch = filters.columns === '1 Column' ? 1 : 2;
-                if (t.columns !== colMatch) return false;
-              }
-              if (filters.color !== 'All' && t.color !== filters.color) return false;
-              return true;
-            })
-            .map(t => (
-            <div key={t.id} style={{ 
-              position: 'relative', background: '#fff', borderRadius: '16px', 
-              overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              border: activeTemplate === t.id ? `2px solid #3b82f6` : '1px solid #e2e8f0',
-              display: 'flex', flexDirection: 'column'
-            }} className="template-card-hover">
-               
-               {t.badge && (
-                 <span style={{ 
-                   position: 'absolute', top: '20px', right: '20px', zIndex: 10,
-                   background: '#dbeafe', color: '#1e40af', padding: '6px 14px', 
-                   borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold',
-                   boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                 }}>{t.badge}</span>
-               )}
-
-               <div style={{ padding: '20px', height: '480px', background: '#f8fafc', overflowY: 'auto', display: 'flex', justifyContent: 'center' }}>
-                 <div style={{ transform: 'scale(0.35)', transformOrigin: 'top center', pointerEvents: 'none' }}>
-                   {(() => {
-                      const tConfig = t;
-                      const mData = {
-                        name: 'DIYA AGARWAL',
-                        role: 'Retail Sales Associate',
-                        email: 'd.agarwal@example.in',
-                        phone: '+91 11 5555 3345',
-                        location: 'New Delhi, India 110034',
-                        summary: 'Customer-focused Retail Sales professional with solid understanding of retail dynamics, marketing and customer service. Offering 5 years of experience providing quality product recommendations and solutions to meet customer needs and exceed expectations.',
-                        skills: ['Cash register operation', 'Inventory management', 'POS system operation', 'Accurate money handling', 'Sales expertise', 'Documentation and recordkeeping'],
-                        experience: [
-                          { company: 'ZARA - New Delhi, India', role: 'Retail Sales Associate', period: '02/2017 - Current', desc: 'Increased monthly sales 10% by effectively upselling and cross-selling products to maximize profitability. Prevented store losses by leveraging awareness, attention to detail, and integrity to identify and investigate concerns.' },
-                          { company: 'Dunkin\' Donuts - New Delhi, India', role: 'Barista', period: '03/2015 - 01/2017', desc: 'Upheld seasonal drinks and pastries, boosting average store sales by ₹1500 weekly. Managed morning rush of over 300 customers daily with efficient, level-headed customer service.' }
-                        ]
-                      };
-                      
-                      const baseStyle = { backgroundColor: '#fff', color: '#111', minHeight: '297mm', width: '210mm', padding: '20mm', boxShadow: '0 0 10px rgba(0,0,0,0.1)', fontFamily: "'Inter', sans-serif" };
-                      
-                      const TextLines = ({ lines = 3, width = '100%', color = '#f1f5f9' }) => (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width }}>
-                          {[...Array(lines)].map((_, i) => (
-                            <div key={i} style={{ height: '14px', background: color, width: i === lines - 1 ? '70%' : '100%', borderRadius: '4px' }} />
-                          ))}
-                        </div>
-                      );
-
-                      if (tConfig.layout === 'header-block') {
-                        return (
-                          <div style={baseStyle}>
-                            <div style={{ backgroundColor: '#2d3748', color: '#fff', margin: '-20mm -20mm 30mm -20mm', padding: '20mm 25mm', display: 'flex', alignItems: 'center', gap: '30px' }}>
-                              <div style={{ width: '100px', height: '100px', border: '2px solid rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold', background: 'rgba(255,255,255,0.1)' }}>DA</div>
-                              <div>
-                                <h1 style={{ fontSize: '4rem', margin: 0, letterSpacing: '2px' }}>{mData.name}</h1>
-                                <p style={{ fontSize: '1.2rem', margin: '5px 0 0 0', opacity: 0.8 }}>{mData.location} | {mData.phone}</p>
-                              </div>
-                            </div>
-                            <div style={{ marginBottom: '40px' }}>
-                               <h3 style={{ fontSize: '1.2rem', textTransform: 'uppercase', marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Summary</h3>
-                               <p style={{ lineHeight: '1.6', fontSize: '1rem', color: '#444' }}>{mData.summary}</p>
-                            </div>
-                            <div style={{ marginBottom: '40px' }}>
-                               <h3 style={{ fontSize: '1.2rem', textTransform: 'uppercase', marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Skills</h3>
-                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                                  {mData.skills.map(s => <div key={s} style={{ fontSize: '1rem', color: '#444' }}>• {s}</div>)}
-                                </div>
-                            </div>
-                            <h3 style={{ fontSize: '1.2rem', textTransform: 'uppercase', marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Experience</h3>
-                            {mData.experience.map((exp, i) => (
-                              <div key={i} style={{ marginBottom: '20px' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}><span>{exp.role}</span><span>{exp.period}</span></div>
-                                <div style={{ fontSize: '0.9rem', color: '#666' }}>{exp.company}</div>
-                                <p style={{ fontSize: '1rem', marginTop: '8px' }}>{exp.desc}</p>
-                              </div>
-                            ))}
-                          </div>
-                        );
-                      }
-                      
-                      if (tConfig.layout === 'monogram-center') {
-                        return (
-                          <div style={baseStyle}>
-                            <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                              <div style={{ width: '100px', height: '100px', borderRadius: '50%', border: '1px solid #111', margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', color: '#111' }}>DA</div>
-                              <h1 style={{ fontSize: '4rem', margin: '0 0 10px 0', letterSpacing: '1px' }}>{mData.name}</h1>
-                              <p style={{ color: '#666', borderBottom: '1px solid #eee', paddingBottom: '20px' }}>{mData.email} | {mData.phone} | {mData.location}</p>
-                            </div>
-                            <div style={{ marginBottom: '40px' }}>
-                               <h3 style={{ fontSize: '1.2rem', textTransform: 'uppercase', textAlign: 'center', marginBottom: '20px' }}>Summary</h3>
-                               <p style={{ lineHeight: '1.6', fontSize: '1rem' }}>{mData.summary}</p>
-                            </div>
-                            <div style={{ marginTop: '30px' }}>
-                               <h3 style={{ fontSize: '1.2rem', textTransform: 'uppercase', textAlign: 'center', marginBottom: '20px' }}>Skills</h3>
-                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                                  <TextLines lines={3} />
-                                  <TextLines lines={3} />
-                               </div>
-                            </div>
-                          </div>
-                        );
-                      }
-
-                      if (tConfig.layout === 'sidebar-left') {
-                        return (
-                          <div style={{ ...baseStyle, display: 'grid', gridTemplateColumns: '70mm 1fr', padding: 0 }}>
-                             <div style={{ borderRight: '1px solid #eee', padding: '15mm 10mm', backgroundColor: '#fff' }}>
-                                <div style={{ width: '50mm', height: '50mm', background: `url(${PERSON_IMAGE})`, backgroundSize: 'cover', backgroundPosition: 'center', marginBottom: '30px' }} />
-                                <h3 style={{ fontSize: '1.1rem', textTransform: 'uppercase', color: '#1a365d', borderBottom: '1px solid #1a365d', paddingBottom: '5px', marginBottom: '15px' }}>Summary</h3>
-                                <TextLines lines={4} />
-                                <h3 style={{ fontSize: '1.1rem', textTransform: 'uppercase', color: '#1a365d', borderBottom: '1px solid #1a365d', paddingBottom: '5px', marginTop: '30px', marginBottom: '15px' }}>Skills</h3>
-                                <TextLines lines={6} color="#f8fafc" />
-                             </div>
-                             <div style={{ padding: '15mm' }}>
-                                <h1 style={{ fontSize: '4rem', color: '#1a365d', margin: '0 0 20px 0' }}>{mData.name}</h1>
-                                <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '30px' }}>{mData.location} | {mData.phone}</p>
-                                <h3 style={{ fontSize: '1.1rem', textTransform: 'uppercase', color: '#1a365d', borderTop: '2px solid #1a365d', paddingTop: '10px', marginBottom: '20px' }}>Experience</h3>
-                                <TextLines lines={10} />
-                             </div>
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <div style={baseStyle}>
-                           <h1 style={{ fontSize: '4rem', margin: '0 0 10px 0' }}>{mData.name}</h1>
-                           <div style={{ height: '3px', background: '#111', width: '100%', marginBottom: '20px' }} />
-                           <TextLines lines={2} color="#f8fafc" />
-                           <div style={{ marginTop: '40px' }}>
-                             <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '5px', marginBottom: '15px' }}>Summary</h3>
-                             <p style={{ lineHeight: '1.6' }}>{mData.summary}</p>
-                           </div>
-                           <div style={{ marginTop: '40px' }}>
-                             <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: '5px', marginBottom: '15px' }}>Experience</h3>
-                             <TextLines lines={12} />
-                           </div>
-                        </div>
-                      );
-                   })()}
-                 </div>
-               </div>
-
-               <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center', justifyContent: 'center' }}>
-                 <div style={{ textAlign: 'center' }}>
-                    <h4 style={{ fontSize: '1.2rem', color: '#111', margin: 0, fontWeight: 'bold' }}>{t.name}</h4>
-                    <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '4px' }}>Premium Layout</p>
-                 </div>
-                 <button 
-                   className="btn-primary" 
-                   onClick={() => { setActiveTemplate(t.id); setShowGallery(false); }}
-                   style={{ 
-                     width: '80%', padding: '0.9rem', borderRadius: '50px', 
-                     fontWeight: 'bold', background: '#3b82f6', border: 'none', 
-                     color: '#fff', cursor: 'pointer', fontSize: '1rem',
-                     boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.5)'
-                   }}
-                 >
-                   Choose template
-                 </button>
-               </div>
+        {/* 2 Experience */}
+        <div className="rm-section-box">
+          <div className="rm-section-title" style={{ justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="rm-number">2</div>
+              Experience
             </div>
-          ))}
+            <button 
+              className="rm-btn-outline" 
+              onClick={() => setData({...data, experience: [...data.experience, { role: '', company: '', period: '', desc: '' }]})}
+              style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+            >
+              + Add Role
+            </button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {data.experience.map((exp, idx) => (
+              <div key={idx} style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid #222', position: 'relative' }}>
+                <button onClick={() => { const newExp = data.experience.filter((_, i) => i !== idx); setData({...data, experience: newExp}); }} style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                <div className="rm-grid-2">
+                  <div className="rm-input-group">
+                    <label>Company</label>
+                    <input className="rm-input" value={exp.company} onChange={e => { const newExp = [...data.experience]; newExp[idx].company = e.target.value; setData({...data, experience: newExp}); }} placeholder="Google" />
+                  </div>
+                  <div className="rm-input-group">
+                    <label>Role/Title</label>
+                    <input className="rm-input" value={exp.role} onChange={e => { const newExp = [...data.experience]; newExp[idx].role = e.target.value; setData({...data, experience: newExp}); }} placeholder="Senior SWE" />
+                  </div>
+                  <div className="rm-input-group" style={{ gridColumn: '1 / -1' }}>
+                    <label>Period (e.g., Jan 2020 - Present)</label>
+                    <input className="rm-input" value={exp.period} onChange={e => { const newExp = [...data.experience]; newExp[idx].period = e.target.value; setData({...data, experience: newExp}); }} placeholder="Jan 2020 - Present" />
+                  </div>
+                  <div className="rm-input-group" style={{ gridColumn: '1 / -1' }}>
+                    <label>Description</label>
+                    <textarea className="rm-input" rows="3" value={exp.desc} onChange={e => { const newExp = [...data.experience]; newExp[idx].desc = e.target.value; setData({...data, experience: newExp}); }} placeholder="Achieved..." />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 3 Education */}
+        <div className="rm-section-box">
+          <div className="rm-section-title" style={{ justifyContent: 'space-between', width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="rm-number">3</div>
+              Education
+            </div>
+            <button 
+              className="rm-btn-outline" 
+              onClick={() => setData({...data, education: [...data.education, { school: '', degree: '', period: '', desc: '' }]})}
+              style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+            >
+              + Add Education
+            </button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+             {data.education.map((edu, idx) => (
+                <div key={idx} style={{ padding: '1.25rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid #222', position: 'relative' }}>
+                  <button onClick={() => { const newEdu = data.education.filter((_, i) => i !== idx); setData({...data, education: newEdu}); }} style={{ position: 'absolute', top: '15px', right: '15px', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                  <div className="rm-grid-2">
+                    <div className="rm-input-group">
+                      <label>School</label>
+                      <input className="rm-input" value={edu.school} onChange={e => { const newEdu = [...data.education]; newEdu[idx].school = e.target.value; setData({...data, education: newEdu}); }} placeholder="University" />
+                    </div>
+                    <div className="rm-input-group">
+                      <label>Degree</label>
+                      <input className="rm-input" value={edu.degree} onChange={e => { const newEdu = [...data.education]; newEdu[idx].degree = e.target.value; setData({...data, education: newEdu}); }} placeholder="B.S. Computer Science" />
+                    </div>
+                    <div className="rm-input-group" style={{ gridColumn: '1 / -1' }}>
+                      <label>Period</label>
+                      <input className="rm-input" value={edu.period} onChange={e => { const newEdu = [...data.education]; newEdu[idx].period = e.target.value; setData({...data, education: newEdu}); }} placeholder="2016-2020" />
+                    </div>
+                  </div>
+                </div>
+             ))}
+          </div>
+        </div>
+
+        {/* 4 Skills & Certs */}
+        <div className="rm-section-box">
+          <div className="rm-section-title">
+            <div className="rm-number">4</div>
+            Skills & Certifications
+          </div>
+          <div className="rm-grid-2">
+            <div className="rm-input-group" style={{ gridColumn: '1 / -1' }}>
+              <label>Skills (comma separated)</label>
+              <textarea className="rm-input" rows="3" value={data.skills.join(', ')} onChange={e => setData({...data, skills: e.target.value.split(',').map(s => s.trim())})} placeholder="React, Node.js..." />
+            </div>
+            <div className="rm-input-group" style={{ gridColumn: '1 / -1' }}>
+              <label>Certifications (comma separated)</label>
+              <textarea className="rm-input" rows="2" value={data.certifications?.join(', ') || ''} onChange={e => setData({...data, certifications: e.target.value.split(',').map(s => s.trim())})} placeholder="AWS Certified..." />
+            </div>
+          </div>
         </div>
       </div>
-    );
-  }
 
-  return (
-    <div className="page-container" style={{ maxWidth: '1800px', width: '95%' }}>
-      <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h2 className="page-title gradient-text">AI Resume Maker</h2>
-          <p className="page-subtitle">Designing with: <strong>{templates.find(t=>t.id===activeTemplate)?.name}</strong></p>
-        </div>
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <button className="btn-secondary" onClick={() => setShowGallery(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--glass-border)', borderRadius: '8px' }}>
-            <Layout size={18} /> Templates
-          </button>
-          <button className="btn-secondary" onClick={() => setShowSavedModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid var(--glass-border)', borderRadius: '8px' }}>
-            <FolderOpen size={18} /> Load Cloud Resumes
-          </button>
-          <button className="btn-secondary" onClick={handleSaveResume} disabled={saving} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', background: 'rgba(99, 102, 241, 0.1)', color: '#818cf8', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: '8px' }}>
-            {saving ? <Loader2 size={18} className="spin" /> : <Save size={18} />} Save to Cloud
-          </button>
-          <button className="btn-primary" onClick={handleDownload} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px' }}>
-            <Download size={18} /> Download PDF
-          </button>
-        </div>
-      </header>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '450px 1fr', gap: '2rem', alignItems: 'start' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: 'calc(100vh - 200px)', overflowY: 'auto', paddingRight: '10px' }}>
-          <div className="card glass" style={{ padding: '1.5rem' }}>
-            <h3 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '10px' }}><Layout size={20}/> Select Template</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '8px' }}>
-              {templates.map(t => (
-                <button key={t.id} onClick={() => setActiveTemplate(t.id)} className="tab-btn" style={{
-                  padding: '10px', borderRadius: '8px',
-                  border: activeTemplate === t.id ? `2px solid ${t.color}` : '2px solid transparent',
-                  background: activeTemplate === t.id ? `${t.color}15` : 'rgba(255,255,255,0.05)',
-                  color: '#fff', textAlign: 'left', fontSize: '0.85rem'
-                }}>
-                  {t.name}
-                </button>
-              ))}
-            </div>
+      {/* Right Pane - Preview */}
+      <div className="rm-right-pane">
+        <div className="rm-right-header">
+          <h2>Preview & Customize</h2>
+          <div className="rm-actions">
+            <button className="rm-btn-outline" onClick={() => setShowAiModal(true)} style={{ color: '#c084fc', borderColor: '#c084fc' }}>
+              <Sparkles size={16}/> Auto-Craft AI
+            </button>
+            <button className="rm-btn-outline" onClick={() => setIsEditionsPanelOpen(true)}>
+              <FolderOpen size={16} /> Previous Editions
+            </button>
+            <button className="rm-btn-solid" onClick={handleSaveResume} disabled={saving} style={{ background: 'var(--primary)', color: 'white', border: 'none' }}>
+              {saving ? <Loader2 size={16} className="spin" /> : <Save size={16} />} Save
+            </button>
+            <button className="rm-btn-solid" onClick={handleDownload} style={{ color: '#000', background: '#fff' }}>
+              <Download size={16} /> Export PDF
+            </button>
           </div>
-          <div className="card glass" style={{ padding: '1.5rem' }}>
-            <h3 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '10px' }}><User size={20}/> Basic Info</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <input value={data.name} onChange={e => setData({...data, name: e.target.value})} placeholder="Full Name" />
-              <input value={data.role} onChange={e => setData({...data, role: e.target.value})} placeholder="Professional Title" />
-              <input value={data.email} onChange={e => setData({...data, email: e.target.value})} placeholder="Email" />
-              <textarea value={data.summary} onChange={e => setData({...data, summary: e.target.value})} placeholder="Brief Summary" rows="4" />
-            </div>
-          </div>
+        </div>
 
-          <div className="card glass" style={{ padding: '1.5rem' }}>
-            <h3 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '10px' }}><Briefcase size={20}/> Experience</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {data.experience.map((exp, idx) => (
-                <div key={idx} style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', position: 'relative' }}>
-                  <button 
-                    onClick={() => {
-                      const newExp = data.experience.filter((_, i) => i !== idx);
-                      setData({...data, experience: newExp});
-                    }}
-                    style={{ position: 'absolute', top: '10px', right: '10px', background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer' }}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <input value={exp.role} onChange={e => {
-                      const newExp = [...data.experience];
-                      newExp[idx].role = e.target.value;
-                      setData({...data, experience: newExp});
-                    }} placeholder="Role" />
-                    <input value={exp.company} onChange={e => {
-                      const newExp = [...data.experience];
-                      newExp[idx].company = e.target.value;
-                      setData({...data, experience: newExp});
-                    }} placeholder="Company" />
-                    <input value={exp.period} onChange={e => {
-                      const newExp = [...data.experience];
-                      newExp[idx].period = e.target.value;
-                      setData({...data, experience: newExp});
-                    }} placeholder="Period (e.g. 2020 - Present)" />
-                    <textarea value={exp.desc} onChange={e => {
-                      const newExp = [...data.experience];
-                      newExp[idx].desc = e.target.value;
-                      setData({...data, experience: newExp});
-                    }} placeholder="Description" rows="3" />
-                  </div>
-                </div>
-              ))}
+        {/* Style Selector */}
+        <div className="rm-style-selector">
+          <div className="rm-style-label">
+            <span>SELECT ART STYLE</span>
+            <span>{templates.length} Styles Available</span>
+          </div>
+          <div className="rm-styles-row">
+            {templates.map(t => (
               <button 
-                className="btn-secondary" 
-                onClick={() => setData({...data, experience: [...data.experience, { role: '', company: '', period: '', desc: '' }]})}
-                style={{ width: '100%', padding: '10px', border: '1px dashed var(--glass-border)' }}
+                key={t.id} 
+                onClick={() => setActiveTemplate(t.id)} 
+                className={`rm-style-btn ${activeTemplate === t.id ? 'active' : ''}`}
+                style={{ borderLeft: activeTemplate === t.id ? `4px solid ${t.color}` : '1px solid #222' }}
               >
-                + Add Experience
+                {t.name}
               </button>
-            </div>
-          </div>
-
-          <div className="card glass" style={{ padding: '1.5rem' }}>
-            <h3 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '10px' }}><GraduationCap size={20}/> Education</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {data.education.map((edu, idx) => (
-                <div key={idx} style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', position: 'relative' }}>
-                  <button 
-                    onClick={() => {
-                      const newEdu = data.education.filter((_, i) => i !== idx);
-                      setData({...data, education: newEdu});
-                    }}
-                    style={{ position: 'absolute', top: '10px', right: '10px', background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer' }}
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <input value={edu.school} onChange={e => {
-                      const newEdu = [...data.education];
-                      newEdu[idx].school = e.target.value;
-                      setData({...data, education: newEdu});
-                    }} placeholder="School" />
-                    <input value={edu.degree} onChange={e => {
-                      const newEdu = [...data.education];
-                      newEdu[idx].degree = e.target.value;
-                      setData({...data, education: newEdu});
-                    }} placeholder="Degree" />
-                    <input value={edu.period} onChange={e => {
-                      const newEdu = [...data.education];
-                      newEdu[idx].period = e.target.value;
-                      setData({...data, education: newEdu});
-                    }} placeholder="Period" />
-                    <textarea value={edu.desc} onChange={e => {
-                      const newEdu = [...data.education];
-                      newEdu[idx].desc = e.target.value;
-                      setData({...data, education: newEdu});
-                    }} placeholder="Description" rows="2" />
-                  </div>
-                </div>
-              ))}
-              <button 
-                className="btn-secondary" 
-                onClick={() => setData({...data, education: [...data.education, { school: '', degree: '', period: '', desc: '' }]})}
-                style={{ width: '100%', padding: '10px', border: '1px dashed var(--glass-border)' }}
-              >
-                + Add Education
-              </button>
-            </div>
-          </div>
-
-          <div className="card glass" style={{ padding: '1.5rem' }}>
-            <h3 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '10px' }}><Sparkles size={20}/> Skills & Certs</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', color: '#aaa' }}>Skills (comma separated)</label>
-                <textarea 
-                  value={data.skills.join(', ')} 
-                  onChange={e => setData({...data, skills: e.target.value.split(',').map(s => s.trim())})} 
-                  placeholder="React, Node.js, Python..." 
-                  rows="3" 
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', color: '#aaa' }}>Certifications (comma separated)</label>
-                <textarea 
-                  value={data.certifications?.join(', ') || ''} 
-                  onChange={e => setData({...data, certifications: e.target.value.split(',').map(s => s.trim())})} 
-                  placeholder="AWS Certified, Google Cloud..." 
-                  rows="3" 
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Preview Container */}
-        <div style={{ background: '#0f172a', padding: '2rem', borderRadius: '12px', display: 'flex', justifyContent: 'center', overflowY: 'auto', maxHeight: '1100px' }}>
-           <div style={{ transform: 'scale(0.95)', transformOrigin: 'top center', width: '210mm' }}>
-             {renderTemplate()}
-           </div>
+        {/* Live Preview Container */}
+        <div className="rm-preview-container">
+          <div style={{ transform: 'scale(0.85)', transformOrigin: 'top center', width: '210mm', height: 'fit-content' }}>
+            {renderTemplate()}
+          </div>
         </div>
       </div>
 
       {/* AI Modals */}
       {showAiModal && (
         <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
-          <div className="card glass" style={{ width: '450px', padding: '2rem' }}>
+          <div className="card glass" style={{ width: '450px', padding: '2rem', background: '#111', border: '1px solid #333', color: '#fff' }}>
             <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Sparkles className="gradient-text"/> AI Resume Magician
+              <Sparkles className="gradient-text" /> AI Resume Magician
             </h3>
             <p style={{ color: '#aaa', marginBottom: '1.5rem', fontSize: '0.9rem' }}>Let AI instantly write your professional summary, skills, and optimize your experience bullets.</p>
             
@@ -984,59 +756,61 @@ Respond ONLY with valid JSON exactly matching this structure:
               placeholder="Target Job Role (e.g. Senior Frontend Engineer)" 
               value={aiPrompt.role} 
               onChange={e => setAiPrompt({...aiPrompt, role: e.target.value})}
-              style={{ marginBottom: '1rem', width: '100%' }}
+              className="rm-input"
+              style={{ marginBottom: '1rem' }}
             />
             <textarea 
               placeholder="Key skills or past achievements to include... (e.g. React, Supabase, Led a team of 5)" 
               value={aiPrompt.keywords} 
               onChange={e => setAiPrompt({...aiPrompt, keywords: e.target.value})}
+              className="rm-input"
               rows="4"
-              style={{ width: '100%', marginBottom: '1.5rem' }}
+              style={{ marginBottom: '1.5rem' }}
             />
             
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button className="btn-secondary" onClick={() => setShowAiModal(false)}>Cancel</button>
-              <button className="btn-primary" onClick={handleGenerateAI} disabled={aiLoading} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {aiLoading ? <Loader2 className="spin" size={18}/> : <Sparkles size={18}/>} Generate
+              <button className="rm-btn-outline" onClick={() => setShowAiModal(false)}>Cancel</button>
+              <button className="rm-btn-solid" onClick={handleGenerateAI} disabled={aiLoading}>
+                {aiLoading ? <Loader2 className="spin" size={16}/> : <Sparkles size={16}/>} Generate
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Saved Cloud Resumes Modal */}
-      {showSavedModal && (
-        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}>
-          <div className="card glass" style={{ width: '600px', padding: '2rem', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <FolderOpen size={24} /> Cloud Saved Resumes
-            </h3>
-            
-            <div style={{ overflowY: 'auto', flex: 1, paddingRight: '10px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {fetchingResumes ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}><Loader2 className="spin" size={24}/></div>
-              ) : savedResumes.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>No saved resumes found in your cloud. Generate one and click Save!</div>
-              ) : (
-                savedResumes.map(r => (
-                  <div key={r.id} style={{ background: 'rgba(255,255,255,0.05)', padding: '1.2rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <h4 style={{ color: '#fff', fontSize: '1.1rem' }}>{r.resume_data.role || 'Professional Resume'}</h4>
-                      <p style={{ color: '#aaa', fontSize: '0.85rem', marginTop: '4px' }}>Last updated: {new Date(r.created_at).toLocaleString()}</p>
-                    </div>
-                    <button className="btn-primary" onClick={() => handleLoadResume(r)}>Load Draft</button>
-                  </div>
-                ))
-              )}
-            </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
-              <button className="btn-secondary" onClick={() => setShowSavedModal(false)}>Close</button>
-            </div>
-          </div>
+      {/* Previous Editions Slide-in Panel */}
+      <div className={`rm-editions-panel ${isEditionsPanelOpen ? 'open' : ''}`}>
+        <div className="rm-editions-header">
+          <h3><FolderOpen size={20} /> Previous Editions</h3>
+          <button onClick={() => setIsEditionsPanelOpen(false)} className="rm-close-btn">&times;</button>
         </div>
-      )}
-
+        
+        <div className="rm-editions-content">
+          {fetchingResumes ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}><Loader2 className="spin" size={24}/></div>
+          ) : savedResumes.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
+              <p>No previous editions found.</p>
+              <p style={{ fontSize: '0.85rem', marginTop: '10px' }}>Save your resume drafts to view them here.</p>
+            </div>
+          ) : (
+            savedResumes.map(r => (
+              <div key={r.id} className="rm-edition-card">
+                <div className="rm-edition-info">
+                  <h4>{r.resume_data.role || 'Draft'}</h4>
+                  <p>{new Date(r.created_at).toLocaleString()}</p>
+                </div>
+                <div className="rm-edition-actions">
+                  <button className="rm-btn-outline rm-btn-load" onClick={() => handleLoadResume(r)}>Load</button>
+                  <button className="rm-btn-delete" onClick={() => handleDeleteResume(r.id)} title="Delete Edition">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 };
